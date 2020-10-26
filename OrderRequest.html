@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <script>
+      function submitOrder() {
+        var url = document.getElementById('url').value;
+        var group = document.getElementById('group').value;
+        var guest = document.getElementById('guest').value;
+        google.script.run.submitOrder(url, group, guest);
+        google.script.host.close();
+      }
+    </script>
+  </head>
+  <body>
+    <h3>Input a foodpanda restaurant url</h3>
+    <div>
+You can search your favor restaurant at <a href="https://www.foodpanda.com.tw/" target="_new">Foodpanda</a>,<br/>
+and paste link (ex. https://www.foodpanda.com.tw/restaurant/z0dj or https://www.foodpanda.com.tw/restaurant/z0dj/chun-ji-ben-jia-tai-bei-ba-de-zong-dian) below.
+    </div>
+    <input id="url" type="text" value="https://www.foodpanda.com.tw/en/restaurant/f2vg" size="60" />z8bq
+    
+    <h3>Select Member Group</h3>
+    <div>
+You can edit your member group at sheet <b>Members</b>,<br/>
+and select your group for this order (empty for no specific members)
+    </div>
+    <select id="group">
+      <option></option>
+<? for (var i = 0; i < groups.length; i++) {
+     var group = groups[i]; ?>
+      <option><?!= group ?></option>
+<? } ?>
+    </select>
+    
+    <h3>Select Number of Guest</h3>
+    <div>
+You can prepare extra slot for guest.
+    </div>
+    <input id="guest" type="text" value="10" />
+    
+    <hr/>
+    <button onClick="submitOrder();">Submit</button>
+  </body>
+</html>
