@@ -1,7 +1,7 @@
 function testFoodpanda() {
-  var vender_id = fetchVender('https://www.foodpanda.com.tw/restaurant/z8bq'); // z0dj
+  var vender_id = fetchVender('https://www.foodpanda.com.tw/en/restaurant/z0dj/chun-ji-ben-jia-tai-bei-ba-de-zong-dian?r=1'); // z0dj
   var menu = fetchMenu(vender_id);
-  createSheet(menu, vender_id, "Compass", 10);
+  createSheet(menu, vender_id, "Engineer", 5);
 }
 
 function fetchVender(url) {
@@ -78,7 +78,9 @@ function fetchMenu(vender_id) {
     topping.options.forEach((option) =>{
       var option_item = {
         "Name": option.name,
-        "Price": option.price
+        "Price": option.price,
+        //"Min": option.quantity_minimum,
+        //"Max": option.quantity_maximum
       };
       topping_item.Options.push(option_item);
     });
