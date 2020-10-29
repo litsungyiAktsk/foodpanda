@@ -176,7 +176,7 @@ function fixDatas(sheet, product_index, product_values, total, max_topping) {
     var sourceRange = sheet.getRange(product_index, COLUMN_TOPPING + max_topping, product_values.length, 1);
     var data = sourceRange.getValues();
     var targetRange = sheet.getRange(product_index, COLUMN_TOPPING + 1, product_values.length, 1);
-    targetRange.setValue(data);
+    targetRange.setValues(data);
     sourceRange.clearContent();
   }
   
