@@ -55,24 +55,30 @@ function onEdit(e) {
   }
   
   if (e.range.columnStart == COLUMN_PRODUCT) {
-    Logger.log("COLUMN_PRODUCT");
-    var lastRow = sheet.getLastRow();
-    var max_topping = sheet.getRange(lastRow, 3).getValue();
+    var last_row = sheet.getLastRow();
+    var members = sheet.getRange(last_row, 2).getValue();
+    var max_topping = sheet.getRange(last_row, 3).getValue();
     
     var product = getSelectedCell(sheet, e.range.rowStart, COLUMN_PRODUCT);
     var variants = getVariantsFromProduct(sheet, product);
     if (variants.length > 0) {
       var rule = SpreadsheetApp.newDataValidation().requireValueInList(variants).build();
+      var variantion_range = sheet.getRange(e.range.rowStart, COLUMN_VARIATION);
+      variantion_range.clearContent();
+      variantion_range.setDataValidation(rule);
       
-      sheet.getRange(e.range.rowStart, COLUMN_VARIATION).clearContent();
-      sheet.getRange(e.range.rowStart, COLUMN_VARIATION).setDataValidation(rule);
-      sheet.getRange(e.range.rowStart, COLUMN_TOPPING, 1, max_topping).clearDataValidations();
-      sheet.getRange(e.range.rowStart, COLUMN_TOPPING, 1, max_topping).clearContent();
+      var topping_range = sheet.getRange(e.range.rowStart, COLUMN_TOPPING, 1, max_topping);
+      topping_range.clearDataValidations();
+      topping_range.clearContent();
     } else {
-      sheet.getRange(e.range.rowStart, COLUMN_VARIATION).clearDataValidations();
-      sheet.getRange(e.range.rowStart, COLUMN_VARIATION).clearContent();
-      sheet.getRange(e.range.rowStart, COLUMN_TOPPING, 1, max_topping).clearDataValidations();
-      sheet.getRange(e.range.rowStart, COLUMN_TOPPING, 1, max_topping).clearContent();
+      var variantion_range = sheet.getRange(e.range.rowStart, COLUMN_VARIATION);
+      variantion_range.clearDataValidations();
+      variantion_range.clearContent();
+      
+      var topping_range = sheet.getRange(e.range.rowStart, COLUMN_TOPPING, 1, max_topping);
+      topping_range.clearDataValidations();
+      topping_range.clearContent();
+      
       var variant = getSelectedCell(sheet, e.range.rowStart, 5);
       var toppings = getToppingsByProductAndVariant(sheet, product, variant);
       for (var topping_index in toppings) {
@@ -83,9 +89,8 @@ function onEdit(e) {
       }
     }
   } else if (e.range.columnStart == COLUMN_VARIATION) {
-    Logger.log("COLUMN_VARIATION");
-    var lastRow = sheet.getLastRow();
-    var max_topping = sheet.getRange(lastRow, 3).getValue();
+    var last_row = sheet.getLastRow();
+    var max_topping = sheet.getRange(last_row, 3).getValue();
     
     sheet.getRange(e.range.rowStart, COLUMN_TOPPING, 1, max_topping).clearDataValidations();
     sheet.getRange(e.range.rowStart, COLUMN_TOPPING, 1, max_topping).clearContent();
