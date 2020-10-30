@@ -18,21 +18,33 @@ function createOrder() {
 
 function submitOrder(url, group, guest) {
   var vender_id = fetchVender(url);
+  if (vender_id == 0) {
+    SpreadsheetApp.getUi().alert("Foodpanda response error, please try again!");
+    return;
+  }
+  
   var menu = fetchMenu(vender_id);
+  if (menu == null) {
+    SpreadsheetApp.getUi().alert("Foodpanda response error, please try again!");
+    return;
+  }
+  
+  log(menu[0])
   createSheet(menu, vender_id, group, guest);
 }
 
-function getFoodpandaUrl() {
-  var ui = SpreadsheetApp.getUi();
-  var result = ui.prompt(
-      'Input a foodpanda restaurant url',
-      'Please enter url:',
-      ui.ButtonSet.OK_CANCEL);
-  var button = result.getSelectedButton();
-  if (button == ui.Button.OK) {
-    return result.getResponseText();
-  } else {
-    return "";
+function log(vender_name) {
+  try {
+    var email = encodeURI(Session.getActiveUser().getEmail());
+    var name = encodeURI(vender_name);
+    var url = "https://script.google.com/macros/s/AKfycbyEvDHr8L5V4CmaQlcXUHpMmLLG9uhVC9vfEDeig928fLzhFg8/exec";
+    url += "?email=" + email + "&name=" + name;
+    var options = {
+      muteHttpExceptions: true,
+    };
+    UrlFetchApp.fetch(url, options);
+  } catch (e) {
+    // NOTE: Ignore error
   }
 }
 
@@ -197,12 +209,14 @@ function getToppingsByProductAndVariant(sheet, product, variant) {
 function summaryOrder() {
   var sheet = SpreadsheetApp.getActiveSheet();
   var vender_id = sheet.getRange(1, 1).getNote();
-  if (vender_id == "") {
+  if (vender_id == 0) {
+    SpreadsheetApp.getUi().alert("Foodpanda response error, please try again!");
     return;
   }
   
   var restaurant_info = fetchRestaurant(vender_id);
-  if (restaurant_info == {}) {
+  if (restaurant_info == null) {
+    SpreadsheetApp.getUi().alert("Foodpanda response error, please try again!");
     return;
   }
   
