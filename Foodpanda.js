@@ -1,7 +1,14 @@
 function testFoodpanda() {
   var vender_id = fetchVender('https://www.foodpanda.com.tw/en/restaurant/z0dj');
+  if (vender_id == 0) {
+    return;
+  }
+  
   var menu = fetchMenu(vender_id);
-  log(menu[0]);
+  if (menu == null) {
+      return;
+  }
+  
   createSheet(menu, vender_id, "Engineer", 5);
 }
 
@@ -64,7 +71,7 @@ function fetchMenu(vender_id) {
   var response = UrlFetchApp.fetch('https://www.foodpanda.com.tw/api/v1/vendors/' + vender_id + '?language_id=6', options);
   if (response.getResponseCode() != 200) {
     Logger.log("Error!");
-    return;
+    return null;
   }
   
   var contents = response.getContentText();

@@ -29,6 +29,7 @@ function submitOrder(url, group, guest) {
     return;
   }
   
+  log(menu[0])
   createSheet(menu, vender_id, group, guest);
 }
 
@@ -208,12 +209,14 @@ function getToppingsByProductAndVariant(sheet, product, variant) {
 function summaryOrder() {
   var sheet = SpreadsheetApp.getActiveSheet();
   var vender_id = sheet.getRange(1, 1).getNote();
-  if (vender_id == "") {
+  if (vender_id == 0) {
+    SpreadsheetApp.getUi().alert("Foodpanda response error, please try again!");
     return;
   }
   
   var restaurant_info = fetchRestaurant(vender_id);
-  if (restaurant_info == {}) {
+  if (restaurant_info == null) {
+    SpreadsheetApp.getUi().alert("Foodpanda response error, please try again!");
     return;
   }
   
