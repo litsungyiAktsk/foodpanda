@@ -193,8 +193,8 @@ function getToppingsByProductAndVariant(sheet, product, variant) {
     var topping_id = topping_ids[topping_id_index];
     for (var topping_index in toppings_list) {
       var topping_item = toppings_list[topping_index];
-      var topping_item_id = topping_item[0];
-      var topping_item_name = topping_item[1];
+      var topping_item_name = topping_item[0];
+      var topping_item_id = topping_item[1];
       if (topping_id == topping_item_id) {
         topping_result.push(topping_item_name);
       }

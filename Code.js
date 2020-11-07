@@ -150,7 +150,7 @@ function initToppings(sheet, topping_index, toppings, max_topping) {
   var topping_values = [];
   toppings.forEach((topping) => {
     topping.Options.forEach((option) => {
-      var topping_item = [topping.Id, option.Name, option.Price];
+      var topping_item = [option.Name + " #(" + topping.Id + ")", topping.Id, option.Name, option.Price];
       topping_values.push(topping_item);
     });
   });
@@ -193,11 +193,11 @@ function initPriceFormula(sheet, product_index, product_values, topping_index, t
   var product_lookup_1 = "VLOOKUP($D2, " + product_range + ", 4, FALSE)";
   var product_lookup_2 = "VLOOKUP($D2 & \" (\" & $E2 & \")\", " + product_range + ", 4, FALSE)";
   var formula = "=IF($D2=\"\", \"\", IF($E2=\"\", IF(ISNA(" + product_lookup_1 + "), 0, " + product_lookup_1 + "), IF(ISNA(" + product_lookup_2 + "), 0, " + product_lookup_2 + "))";
-  var topping_range = "$D$" + topping_index + ":$E$" + (topping_index + topping_values.length);
+  var topping_range = "$C$" + topping_index + ":$F$" + (topping_index + topping_values.length - 1);
   var start_column = "F".charCodeAt(0);
   for (var count = 0; count < max_topping; ++count) {
     var column_notion = String.fromCharCode(start_column + count);
-    var topping_lookup = "VLOOKUP($" + column_notion + "2, " + topping_range + ", 2, FALSE)";
+    var topping_lookup = "VLOOKUP($" + column_notion + "2, " + topping_range + ", 4, FALSE)";
     formula += " + IF($" + column_notion + "2=\"\", 0, IF(ISNA(" + topping_lookup + "), 0, " + topping_lookup + "))";
   }
   
