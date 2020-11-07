@@ -43,7 +43,7 @@ function createSheet(menu, vender_id, group, guest) {
   var topping_values = initToppings(sheet, topping_index, toppings, max_topping);
   fixDatas(sheet, product_index, product_values, total, max_topping);
   initPriceFormula(sheet, product_index, product_values, topping_index, topping_values, total, max_topping);
-  initSummaryFormula(sheet, total);
+  initSummaryFormula(sheet, total, max_topping);
 
   var note_index = topping_index + topping_values.length + 1;
   initNote(sheet, product_index, product_values, topping_index, topping_values, note_index, total, max_topping);
@@ -93,17 +93,19 @@ function initMembers(sheet, members, total) {
   }
 }
 
-function initSummaryFormula(sheet, total) {
+function initSummaryFormula(sheet, total, max_topping) {
   var formula1 = "=SORT(UNIQUE($D$2:$D$" + (total + 2) + "), 1, TRUE)";
   sheet.getRange(total + 4, COLUMN_PRODUCT).setFormula(formula1);
   
   var formula2 = "=IF($D" + (total + 4) + " <> \"\", COUNTIF($D$2:$D$" + (total + 2) + ", $D" + (total + 4) + "),\"\")";
   sheet.getRange(total + 4, COLUMN_PRICE, total + 1, 1).setFormula(formula2);
   
-  var formula3 = "=SORT(UNIQUE(FILTER($J$2:$J$" + (total + 2) + ", $J$2:$J$" + (total + 2) + "<> \"\")), 1, TRUE)";
+  var end_index = (max_topping > 0) ? max_topping : 1;
+  var end_column = String.fromCharCode("F".charCodeAt(0) + end_index + 1);
+  var formula3 = "=SORT(UNIQUE(FILTER($" + end_column + "$2:$" + end_column + "$" + (total + 2) + ", $" + end_column + "$2:$" + end_column + "$" + (total + 2) + "<> \"\")), 1, TRUE)";
   sheet.getRange(total + 4, COLUMN_PRODUCT + 2).setFormula(formula3);
   
-  var formula4 = "=IF($F" + (total + 4) + " <> \"\", COUNTIF($J$2:$J$" + (total + 2) + ", $F" + (total + 4) + "), \"\")";
+  var formula4 = "=IF($F" + (total + 4) + " <> \"\", COUNTIF($" + end_column + "$2:$" + end_column + "$" + (total + 2) + ", $F" + (total + 4) + "), \"\")";
   sheet.getRange(total + 4, COLUMN_PRICE + 2, total + 1, 1).setFormula(formula4);
 }
 

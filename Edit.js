@@ -1,8 +1,10 @@
 function onOpen() {
   SpreadsheetApp.getUi()
       .createMenu('🐼 foodpanda')
-      .addItem('🍔 Create Order', 'createOrder')
-      .addItem('💳 Summary Order', 'summaryOrder')
+      .addItem('🍔 建立訂單', 'createOrder')
+      .addItem('🗒 檢視訂單', 'summaryOrder')
+      .addItem('💳 通知取餐', 'notifyTakeOff')
+      .addItem('🎉 通知付款', 'notifyPayment')
       .addToUi();
 }
 
@@ -244,8 +246,117 @@ function summaryOrder() {
   template.datas = datas;
   var text = template.evaluate().getContent();
   var html = HtmlService.createHtmlOutput(text)
-      .setTitle('Order Summary');
-  SpreadsheetApp.getUi().showSidebar(html);
+      .setWidth(600)
+      .setHeight(500);
+  SpreadsheetApp.getUi().showModalDialog(html, '檢視訂單');
+}
+
+function notifyTakeOff() {
+  var template = HtmlService.createTemplateFromFile('TakeOffForm');
+  template.userName = getUserName();
+  var text = template.evaluate().getContent();
+  var html = HtmlService.createHtmlOutput(text)
+      .setWidth(600)
+      .setHeight(500);
+  SpreadsheetApp.getUi().showModalDialog(html, '通知取餐');
+}
+
+function sendArriveMessage(originMessage) {
+  var bot = createBot();
+  var datas = fetchOrderDatas();
+  for (var index in datas) {
+    var item = datas[index];
+    var message = replaceParameters(originMessage, item);
+    sendSlackMessage(bot, message, item.name);
+  }
+}
+
+function sendArriveAndPayMessage(originMessage, originPayMessage) {
+  var bot = createBot();
+  var datas = fetchOrderDatas();
+  for (var index in datas) {
+    var item = datas[index];
+    var message = replaceParameters(originMessage, item);
+    if (item.paid == 0) {
+      message += "\n" + replaceParameters(originPayMessage, item);
+    }
+
+    sendSlackMessage(bot, message, item.name);
+  }
+}
+
+function notifyPayment() {
+  var template = HtmlService.createTemplateFromFile('PaymentForm');
+  template.userName = getUserName();
+  var text = template.evaluate().getContent();
+  var html = HtmlService.createHtmlOutput(text)
+      .setWidth(600)
+      .setHeight(500);
+  SpreadsheetApp.getUi().showModalDialog(html, '通知繳費');
+}
+
+function sendPayMessage(originMessage) {
+  var bot = createBot();
+  var datas = fetchOrderDatas();
+  for (var index in datas) {
+    var item = datas[index];
+    var message = replaceParameters(originMessage, item);
+    if (item.paid != 0) {
+      continue;
+    }
+
+    sendSlackMessage(bot, message, item.name);
+  }
+}
+
+function fetchOrderDatas() {
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var lastRow = sheet.getLastRow();
+  var info_values = sheet.getRange(lastRow, 2, 1, 6).getValues()[0];
+  var max_member = info_values[0];
+  var max_topping = info_values[1];
+  var datas = sheet.getRange(2, 1, max_member, 7 + max_topping).getValues();
+  var results = [];
+  for (var index in datas) {
+    var item = datas[index];
+    var name = item[0];
+    if (name == "") {
+      continue;
+    }
+
+    var paid = item[1];
+    var price = item[2];
+    var summary = item[max_topping + 6];
+
+    results.push({name: name, paid: paid, price: price, summary: summary});
+  }
+
+  return results;
+}
+
+function createBot() {
+  var scriptProperties = PropertiesService.getScriptProperties();
+  var serviceId = scriptProperties.getProperty('SlackServiceId');
+  var botId = scriptProperties.getProperty('SlackBotId');
+  var token = scriptProperties.getProperty('SlackToken');
+  
+  return new IncomingWebHook(serviceId, botId, token, "Foodpanda", ":foodpanda:");
+}
+
+function sendSlackMessage(bot, message, name) {
+  var param = new SlackPayload();
+  param.text = message;
+  param.channel = "@" + name;
+  bot.send(param);
+}
+
+function replaceParameters(message, item) {
+  return message.replace("{{name}}", item.name).replace("{{summary}}", item.summary).replace("{{price}}", item.price);
+}
+
+function getUserName() {
+  var email = encodeURI(Session.getActiveUser().getEmail());
+  return email.replace("@aktsk.com", "");
 }
 
 function testEdit() {

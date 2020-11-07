@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <script>
+      function notification() {
+        var messageArrive = document.getElementById('messageArrive').value;
+        var notifyPay = document.getElementById('notifyPay').checked;
+        if (notifyPay) {
+          var messagePay = document.getElementById('messagePay').value;
+          google.script.run.sendArriveAndPayMessage(messageArrive, messagePay);
+        } else {
+          google.script.run.sendArriveMessage(messageArrive);
+        }
+
+        google.script.host.close();
+      }
+    </script>
+  </head>
+  <body>
+    <h3>取餐通知</h3>
+    <div>
+      <label>訊息</label>
+    </div>
+    <div>
+     <textarea id="messageArrive" style="width: 100%; height: 100px;">Hello {{name}}
+你的餐點已經送到 *Seminar Space* ，可以去拿囉！
+你訂購的餐點為： {{summary}} 不要拿錯囉！</textarea>
+    </div>
+    <div style="color: red; font-weight: bold;">請記得更改取餐地點喔！！</div>
+    <h3>繳錢通知</h3>
+    <div>
+      <label>通知未付款的人付錢？</label>
+      <input type="checkbox" id="notifyPay" value="true" />
+    </div>
+    <div>
+      <label>訊息</label>
+    </div>
+    <div>
+     <textarea id="messagePay" style="width: 100%; height: 40px;">你的餐點一共 ${{price}}，請交給 *@<?!= userName ?>*</textarea>
+    </div>
+    <div style="color: red; font-weight: bold;">請記得更改收錢的人喔！！</div>
+    <div>
+      <button onClick="notification();">通知取餐</button>
+    </div>
+    <hr/>
+    <h3>可用參數</h3>
+    <div>
+      <dl>
+        <dt>{{name}}</dt>
+        <dd>訂購人。</dd>
+        <dt>{{summary}}</dt>
+        <dd>點餐的內容。</dd>
+        <dt>{{price}}</dt>
+        <dd>餐點金額。</dd>
+      </dl>
+    </div>
+  </body>
+</html>
